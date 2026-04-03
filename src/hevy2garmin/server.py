@@ -42,12 +42,34 @@ async def dashboard(request: Request):
     synced_count = db.get_synced_count()
     recent = db.get_recent_synced(5)
     hevy_total = 0
+    matched_count = 0
     try:
         from hevy2garmin.hevy import HevyClient
-        hevy_total = HevyClient(api_key=config.get("hevy_api_key")).get_workout_count()
+        from hevy2garmin.garmin import get_client
+        from hevy2garmin.matcher import fetch_garmin_activities, match_workouts_to_garmin
+
+        hevy = HevyClient(api_key=config.get("hevy_api_key"))
+        hevy_total = hevy.get_workout_count()
+
+        # Match recent Hevy workouts against Garmin activities
+        if config.get("garmin_email"):
+            try:
+                garmin_client = get_client(config.get("garmin_email"))
+                garmin_acts = fetch_garmin_activities(garmin_client, count=50)
+                hevy_recent = hevy.get_workouts(page=1, page_size=10).get("workouts", [])
+                matches = match_workouts_to_garmin(hevy_recent, garmin_acts)
+                matched_count = len(matches)
+            except Exception:
+                pass
     except Exception:
         pass
-    return _render("dashboard.html", synced_count=synced_count, hevy_total=hevy_total, recent=recent)
+    return _render(
+        "dashboard.html",
+        synced_count=synced_count,
+        matched_count=matched_count,
+        hevy_total=hevy_total,
+        recent=recent,
+    )
 
 
 @app.get("/setup", response_class=HTMLResponse)
@@ -88,12 +110,33 @@ async def workouts_page(request: Request):
     workouts = []
     try:
         from hevy2garmin.hevy import HevyClient
+        from hevy2garmin.garmin import get_client
+        from hevy2garmin.matcher import fetch_garmin_activities, match_workouts_to_garmin
+
         data = HevyClient(api_key=config.get("hevy_api_key")).get_workouts(page=1, page_size=10)
-        for w in data.get("workouts", []):
-            w["synced"] = db.is_synced(w["id"])
+        workouts_raw = data.get("workouts", [])
+
+        # Match against Garmin
+        matches = {}
+        if config.get("garmin_email"):
+            try:
+                garmin_client = get_client(config.get("garmin_email"))
+                garmin_acts = fetch_garmin_activities(garmin_client, count=50)
+                matches = match_workouts_to_garmin(workouts_raw, garmin_acts)
+            except Exception:
+                pass
+
+        for w in workouts_raw:
             w["start_time"] = w.get("start_time") or w.get("startTime", "")
             w["end_time"] = w.get("end_time") or w.get("endTime", "")
-        workouts = data.get("workouts", [])
+            if db.is_synced(w["id"]):
+                w["status"] = "uploaded"  # we uploaded it
+            elif w["id"] in matches:
+                w["status"] = "matched"   # already on Garmin (not by us)
+                w["garmin_match"] = matches[w["id"]]
+            else:
+                w["status"] = "pending"   # not on Garmin
+        workouts = workouts_raw
     except Exception as e:
         logger.error("Failed to fetch workouts: %s", e)
     return _render("workouts.html", workouts=workouts)

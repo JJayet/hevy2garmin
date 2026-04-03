@@ -17,15 +17,15 @@
 <!-- Stats -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-value accent">{{ synced_count }}</div>
-        <div class="stat-label">Uploaded to Garmin</div>
+        <div class="stat-value accent">{{ synced_count + matched_count }}</div>
+        <div class="stat-label">On Garmin</div>
     </div>
     <div class="stat-card">
         <div class="stat-value blue">{{ hevy_total }}</div>
         <div class="stat-label">Workouts in Hevy</div>
     </div>
     <div class="stat-card">
-        <div class="stat-value {% if hevy_total - synced_count > 0 %}amber{% endif %}">{{ hevy_total - synced_count }}</div>
+        <div class="stat-value {% if hevy_total - synced_count - matched_count > 0 %}amber{% endif %}">{{ hevy_total - synced_count - matched_count }}</div>
         <div class="stat-label">Not yet on Garmin</div>
     </div>
 </div>

@@ -24,18 +24,23 @@
 <div id="sync-result"></div>
 
 {% for w in workouts %}
-<div class="card" style="margin-bottom: 12px; {% if w.synced %}opacity: 0.6;{% endif %}">
+<div class="card" style="margin-bottom: 12px; {% if w.status != 'pending' %}opacity: 0.65;{% endif %}">
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div style="flex: 1;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
                 <span style="font-weight: 700; font-size: 16px;">{{ w.title }}</span>
-                {% if w.synced %}
+                {% if w.status == 'uploaded' %}
                 <span class="badge badge-success">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                    On Garmin
+                    Uploaded
+                </span>
+                {% elif w.status == 'matched' %}
+                <span class="badge badge-success">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    On Garmin{% if w.garmin_match and w.garmin_match.garmin_name %} as "{{ w.garmin_match.garmin_name }}"{% endif %}
                 </span>
                 {% else %}
-                <span class="badge badge-pending">Not synced</span>
+                <span class="badge badge-pending">Not on Garmin</span>
                 {% endif %}
             </div>
             <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
@@ -66,7 +71,7 @@
             </div>
         </div>
         <div style="flex-shrink: 0; margin-left: 16px;">
-            {% if not w.synced %}
+            {% if w.status == 'pending' %}
             <button
                 class="btn btn-secondary btn-sm"
                 hx-post="/api/sync/{{ w.id }}"
