@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Settings · hevy2garmin{% endblock %}
+
+{% block content %}
+<h1>Settings</h1>
+
+<form method="post" action="/settings">
+    <article>
+        <header><h3>API Credentials</h3></header>
+        <label>
+            Hevy API Key
+            <input type="text" name="hevy_api_key" value="{{ config.get('hevy_api_key', '') }}" placeholder="Your Hevy API key">
+        </label>
+        <label>
+            Garmin Email
+            <input type="email" name="garmin_email" value="{{ config.get('garmin_email', '') }}" placeholder="Garmin email">
+        </label>
+        <label>
+            Garmin Password
+            <input type="password" name="garmin_password" placeholder="Leave blank to keep current">
+        </label>
+    </article>
+
+    <article>
+        <header><h3>User Profile</h3></header>
+        <div class="grid">
+            <label>
+                Weight (kg)
+                <input type="number" name="weight_kg" value="{{ config.get('user_profile', {}).get('weight_kg', 80) }}" step="0.1">
+            </label>
+            <label>
+                Birth Year
+                <input type="number" name="birth_year" value="{{ config.get('user_profile', {}).get('birth_year', 1990) }}">
+            </label>
+            <label>
+                Sex
+                <select name="sex">
+                    <option value="male" {{ 'selected' if config.get('user_profile', {}).get('sex', 'male') == 'male' }}>Male</option>
+                    <option value="female" {{ 'selected' if config.get('user_profile', {}).get('sex') == 'female' }}>Female</option>
+                </select>
+            </label>
+        </div>
+    </article>
+
+    <article>
+        <header><h3>Timing (seconds)</h3></header>
+        <div class="grid">
+            <label>
+                Working Set
+                <input type="number" name="working_set_seconds" value="{{ config.get('timing', {}).get('working_set_seconds', 40) }}">
+            </label>
+            <label>
+                Warmup Set
+                <input type="number" name="warmup_set_seconds" value="{{ config.get('timing', {}).get('warmup_set_seconds', 25) }}">
+            </label>
+            <label>
+                Rest Between Sets
+                <input type="number" name="rest_between_sets_seconds" value="{{ config.get('timing', {}).get('rest_between_sets_seconds', 75) }}">
+            </label>
+            <label>
+                Rest Between Exercises
+                <input type="number" name="rest_between_exercises_seconds" value="{{ config.get('timing', {}).get('rest_between_exercises_seconds', 120) }}">
+            </label>
+        </div>
+    </article>
+
+    <button type="submit">Save Settings</button>
+</form>
+
+{% if unmapped %}
+<article>
+    <header><h3>Unmapped Exercises ({{ unmapped|length }})</h3></header>
+    <p><small>These exercises show as "Unknown" in Garmin. Add custom mappings to fix them.</small></p>
+    <ul class="exercise-list">
+        {% for name, count in unmapped %}
+        <li>
+            <span>{{ name }} <small>(used {{ count }}x)</small></span>
+            <span class="badge badge-warning">unmapped</span>
+        </li>
+        {% endfor %}
+    </ul>
+</article>
+{% endif %}
+{% endblock %}

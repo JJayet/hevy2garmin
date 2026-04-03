@@ -223,6 +223,11 @@ def main() -> None:
     map_parser.add_argument("--category", type=int, required=True, help="FIT SDK exercise category")
     map_parser.add_argument("--subcategory", type=int, required=True, help="FIT SDK exercise subcategory")
 
+    # serve
+    serve_parser = subparsers.add_parser("serve", help="Start web dashboard")
+    serve_parser.add_argument("-p", "--port", type=int, default=8000, help="Port (default: 8000)")
+    serve_parser.add_argument("--host", default="0.0.0.0", help="Host (default: 0.0.0.0)")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -233,6 +238,11 @@ def main() -> None:
     logging.basicConfig(format="%(message)s", level=level, force=True)
 
     try:
+        if args.command == "serve":
+            from hevy2garmin.server import run_server
+            run_server(host=args.host, port=args.port)
+            return
+
         commands = {
             "init": cmd_init,
             "sync": cmd_sync,

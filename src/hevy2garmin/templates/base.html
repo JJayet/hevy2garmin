@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>{% block title %}hevy2garmin{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <style>
+        :root { --pico-font-size: 16px; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .badge-success { background: #22c55e20; color: #22c55e; }
+        .badge-warning { background: #f59e0b20; color: #f59e0b; }
+        .badge-error { background: #ef444420; color: #ef4444; }
+        .badge-muted { background: #52525b20; color: #9ca3af; }
+        .stat-card { text-align: center; padding: 1rem; }
+        .stat-card h2 { margin: 0; font-size: 2rem; }
+        .stat-card small { color: var(--pico-muted-color); }
+        .exercise-list { list-style: none; padding: 0; }
+        .exercise-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-between; align-items: center; }
+        .toast { position: fixed; bottom: 1rem; right: 1rem; padding: 0.75rem 1.5rem; border-radius: 8px; background: #22c55e; color: white; z-index: 100; animation: fadeout 3s forwards; }
+        .toast-error { background: #ef4444; }
+        @keyframes fadeout { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+        nav .brand { font-weight: 700; font-size: 1.1rem; }
+        .sync-spinner { display: none; }
+        .htmx-request .sync-spinner { display: inline-block; }
+        .htmx-request .sync-text { display: none; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="container">
+        <ul>
+            <li><a href="/" class="brand">⚡ hevy2garmin</a></li>
+        </ul>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/workouts">Workouts</a></li>
+            <li><a href="/history">History</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <small><a href="https://github.com/drkostas/hevy2garmin">hevy2garmin</a> · Sync Hevy workouts to Garmin Connect</small>
+    </footer>
+</body>
+</html>

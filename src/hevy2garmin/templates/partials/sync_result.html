@@ -1,0 +1,6 @@
+<div role="alert" style="padding: 0.75rem; border-radius: 8px; background: {{ 'var(--pico-del-color)' if result.failed else 'var(--pico-ins-color)' }}20; margin-top: 0.5rem;">
+    ✓ <strong>{{ result.synced }}</strong> synced
+    {% if result.skipped %} · {{ result.skipped }} skipped{% endif %}
+    {% if result.failed %} · <strong>{{ result.failed }} failed</strong>{% endif %}
+    {% if result.unmapped %} · ⚠ {{ result.unmapped|length }} unmapped exercises{% endif %}
+</div>

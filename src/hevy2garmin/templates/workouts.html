@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Workouts · hevy2garmin{% endblock %}
+
+{% block content %}
+<h1>Hevy Workouts</h1>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <p>Showing {{ workouts|length }} most recent workouts</p>
+    <button
+        hx-post="/api/sync"
+        hx-target="#sync-result"
+        hx-indicator="#sync-all-btn"
+        id="sync-all-btn"
+        class="outline"
+    >
+        <span class="sync-text">⚡ Sync All Unsynced</span>
+        <span class="sync-spinner" aria-busy="true">Syncing...</span>
+    </button>
+</div>
+
+<div id="sync-result"></div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Exercises</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for w in workouts %}
+        <tr>
+            <td>
+                {% if w.synced %}
+                <span class="badge badge-success">✓ Synced</span>
+                {% else %}
+                <span class="badge badge-muted">Pending</span>
+                {% endif %}
+            </td>
+            <td>{{ w.start_time[:16] }}</td>
+            <td><strong>{{ w.title }}</strong></td>
+            <td>{{ w.exercises|length }}</td>
+            <td>
+                {% if not w.synced %}
+                <button
+                    hx-post="/api/sync/{{ w.id }}"
+                    hx-target="closest tr"
+                    hx-swap="outerHTML"
+                    class="outline secondary"
+                    style="padding: 4px 12px; font-size: 0.8rem;"
+                >Sync</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · hevy2garmin{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="grid">
+    <article class="stat-card">
+        <h2>{{ synced_count }}</h2>
+        <small>Workouts Synced</small>
+    </article>
+    <article class="stat-card">
+        <h2>{{ hevy_total }}</h2>
+        <small>Total in Hevy</small>
+    </article>
+    <article class="stat-card">
+        <h2>{{ hevy_total - synced_count }}</h2>
+        <small>Pending</small>
+    </article>
+</div>
+
+<article>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Quick Sync</h3>
+            <button
+                hx-post="/api/sync"
+                hx-target="#sync-result"
+                hx-indicator="#sync-btn"
+                id="sync-btn"
+                class="outline"
+            >
+                <span class="sync-text">⚡ Sync Recent</span>
+                <span class="sync-spinner" aria-busy="true">Syncing...</span>
+            </button>
+        </div>
+    </header>
+    <div id="sync-result"></div>
+</article>
+
+{% if recent %}
+<article>
+    <header><h3>Recently Synced</h3></header>
+    <ul class="exercise-list">
+        {% for r in recent %}
+        <li>
+            <div>
+                <strong>{{ r.title }}</strong>
+                <br><small>{{ r.synced_at }}</small>
+            </div>
+            <div>
+                {% if r.garmin_activity_id %}
+                <span class="badge badge-success">✓ garmin:{{ r.garmin_activity_id }}</span>
+                {% else %}
+                <span class="badge badge-warning">no activity ID</span>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</article>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Setup · hevy2garmin{% endblock %}
+
+{% block content %}
+<article>
+    <header>
+        <h1>Welcome to hevy2garmin</h1>
+        <p>Let's get you set up. This takes about 2 minutes.</p>
+    </header>
+
+    <form method="post" action="/setup">
+        <h3>1. Hevy API Key</h3>
+        <p><small>Get your key from <a href="https://hevyapp.com/settings" target="_blank">hevyapp.com → Settings → Developer</a></small></p>
+        <input type="text" name="hevy_api_key" placeholder="Your Hevy API key" value="{{ config.get('hevy_api_key', '') }}" required>
+
+        <h3>2. Garmin Connect</h3>
+        <input type="email" name="garmin_email" placeholder="Garmin email" value="{{ config.get('garmin_email', '') }}">
+        <input type="password" name="garmin_password" placeholder="Garmin password (stored locally only)">
+
+        <h3>3. Your Profile</h3>
+        <p><small>Used for calorie estimation in FIT files</small></p>
+        <div class="grid">
+            <label>
+                Weight (kg)
+                <input type="number" name="weight_kg" value="{{ config.get('user_profile', {}).get('weight_kg', 80) }}" step="0.1">
+            </label>
+            <label>
+                Birth year
+                <input type="number" name="birth_year" value="{{ config.get('user_profile', {}).get('birth_year', 1990) }}">
+            </label>
+            <label>
+                Sex
+                <select name="sex">
+                    <option value="male" {{ 'selected' if config.get('user_profile', {}).get('sex', 'male') == 'male' }}>Male</option>
+                    <option value="female" {{ 'selected' if config.get('user_profile', {}).get('sex') == 'female' }}>Female</option>
+                </select>
+            </label>
+        </div>
+
+        <button type="submit">Save & Continue →</button>
+    </form>
+</article>
+{% endblock %}
