@@ -120,20 +120,20 @@ def is_configured() -> bool:
     config = load_config()
     if not config.get("hevy_api_key"):
         return False
-    # On cloud deployments, also check that Garmin auth has completed
+    # On cloud deployments, check that Garmin credentials were saved (not tokens —
+    # those come later on first successful auth; blocking on tokens traps users
+    # in a setup loop when Garmin auth fails due to captcha/rate limits)
     from hevy2garmin.db import get_database_url
     if get_database_url():
         try:
             from hevy2garmin.db import get_db
-            db = get_db()
-            # Check if we have any synced workouts OR if setup was completed
-            # by looking for a setup_complete flag in sync_log
-            if not hasattr(db, '_get_conn'):
+            _db = get_db()
+            if not hasattr(_db, '_get_conn'):
                 return True  # SQLite fallback
-            with db._get_conn() as conn:
+            with _db._get_conn() as conn:
                 with conn.cursor() as cur:
                     cur.execute(
-                        "SELECT 1 FROM platform_credentials WHERE platform = 'garmin_tokens' AND credentials != '{}' LIMIT 1"
+                        "SELECT 1 FROM platform_credentials WHERE platform = 'garmin' LIMIT 1"
                     )
                     if cur.fetchone() is None:
                         return False

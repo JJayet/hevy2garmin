@@ -355,7 +355,9 @@ async def setup_save(
             logger.warning("Garmin login test failed: %s", e)
             garmin_error = str(e)
     if garmin_error:
-        return _render("setup.html", config=load_config(), garmin_error=garmin_error)
+        # Show error but allow continuing — Garmin auth can be retried from Settings
+        return _render("setup.html", config=load_config(), garmin_error=garmin_error,
+                        allow_skip=True)
 
     # GitHub Actions setup happens async after redirect via /api/setup-actions
     # (called by the dashboard on first load when GITHUB_PAT is set)
