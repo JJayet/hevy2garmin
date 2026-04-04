@@ -75,16 +75,23 @@ def upload_fit(client: Garmin, fit_path: str | Path, workout_start: str | None =
     activity_id = None
 
     if isinstance(resp, dict):
-        upload_id = resp.get("detailedImportResult", {}).get("uploadId")
+        detail = resp.get("detailedImportResult", {})
+        upload_id = detail.get("uploadId")
+        # Some versions return activity ID directly
+        successes = detail.get("successes", [])
+        if successes and isinstance(successes, list):
+            activity_id = successes[0].get("internalId")
+        failures = detail.get("failures", [])
+        if failures:
+            logger.warning("  Upload had failures: %s", failures)
 
-    # Wait for Garmin to process, then find the activity by start time
-    if upload_id:
-        logger.info("  Upload accepted (uploadId=%s), waiting for processing...", upload_id)
-        time.sleep(8)
+    # Wait briefly for Garmin to process, then find the activity
+    if upload_id and not activity_id:
+        logger.info("  Upload accepted (uploadId=%s), finding activity...", upload_id)
+        time.sleep(3)
         if workout_start:
             activity_id = find_activity_by_start_time(client, workout_start)
         if not activity_id:
-            # Fallback: grab most recent
             try:
                 activities = _limiter.call(client.get_activities, 0, 5)
                 if activities:
