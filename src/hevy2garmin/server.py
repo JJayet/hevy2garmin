@@ -89,13 +89,24 @@ def _acquire_sync_lock() -> bool:
 
 
 def _get_unmapped_exercises() -> list[tuple[str, int]]:
-    """Get unmapped exercises. Uses DB cache (updated during sync)."""
+    """Get unmapped exercises. Uses DB cache (updated during sync).
+
+    Filters out names that already have a mapping at read time, so the
+    list reflects current state instead of waiting for the next sync to
+    rebuild the cache.
+    """
+    from hevy2garmin.mapper import lookup_exercise
+
+    def _filter_mapped(d: dict[str, int]) -> dict[str, int]:
+        return {n: c for n, c in d.items() if lookup_exercise(n)[0] == 65534}
+
     # Try DB cache first (instant)
     try:
         _db = db.get_db()
         cached = _db.get_app_config("unmapped_exercises")
         if cached and isinstance(cached, dict):
-            return sorted(cached.items(), key=lambda x: -x[1])
+            filtered = _filter_mapped(cached)
+            return sorted(filtered.items(), key=lambda x: -x[1])
     except Exception:
         pass
 
@@ -103,7 +114,8 @@ def _get_unmapped_exercises() -> list[tuple[str, int]]:
     global _unmapped_cache, _unmapped_cache_time
     import time as _t
     if _unmapped_cache is not None and (_t.time() - _unmapped_cache_time) < 600:
-        return _unmapped_cache
+        filtered = _filter_mapped(dict(_unmapped_cache))
+        return sorted(filtered.items(), key=lambda x: -x[1])
 
     config = load_config()
     unmapped: dict[str, int] = {}
