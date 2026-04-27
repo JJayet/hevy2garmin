@@ -46,3 +46,5 @@ worker-di/.wrangler/
 
 # Claude Code local instructions (never committed)
 CLAUDE.md
+.vercel
+.env*.local
