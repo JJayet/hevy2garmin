@@ -91,3 +91,51 @@ class TestCustomMappings:
         m._custom_mappings.clear()
         # Should not crash when file doesn't exist
         _ensure_custom_loaded()
+
+    def test_save_with_db_url_skips_disk(self, tmp_path: Path) -> None:
+        """On cloud (DATABASE_URL set), must not touch filesystem.
+
+        Regression: Vercel serverless filesystems are read-only outside /tmp,
+        so writing ~/.hevy2garmin/custom_mappings.json raised OSError → 500
+        when users mapped exercises in the dashboard.
+        """
+        import hevy2garmin.mapper as m
+        m._custom_mappings.clear()
+
+        unwritable = tmp_path / "should_not_be_created.json"
+
+        class FakeDB:
+            def __init__(self) -> None:
+                self.saved: list[tuple[str, int, int]] = []
+
+            def save_custom_mapping(self, name: str, cat: int, sub: int) -> None:
+                self.saved.append((name, cat, sub))
+
+        fake_db = FakeDB()
+
+        with patch("hevy2garmin.db.get_database_url", return_value="postgres://x"), \
+             patch("hevy2garmin.db.get_db", return_value=fake_db), \
+             patch.object(Path, "expanduser", return_value=unwritable):
+            save_custom_mapping("Cloud Exercise", 7, 3)
+
+        assert fake_db.saved == [("Cloud Exercise", 7, 3)]
+        assert not unwritable.exists()
+        assert m._custom_mappings["Cloud Exercise"] == (7, 3)
+        m._custom_mappings.clear()
+
+    def test_save_without_db_url_writes_disk(self, tmp_path: Path) -> None:
+        """Local/Docker (no DATABASE_URL) keeps filesystem persistence."""
+        import hevy2garmin.mapper as m
+        m._custom_mappings.clear()
+
+        target = tmp_path / "custom_mappings.json"
+
+        with patch("hevy2garmin.db.get_database_url", return_value=None), \
+             patch.object(Path, "expanduser", return_value=target):
+            save_custom_mapping("Local Exercise", 4, 2)
+
+        assert target.exists()
+        data = json.loads(target.read_text())
+        assert data["Local Exercise"] == [4, 2]
+        assert m._custom_mappings["Local Exercise"] == (4, 2)
+        m._custom_mappings.clear()

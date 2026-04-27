@@ -917,13 +917,7 @@ async def api_save_mapping(request: Request):
     if category not in valid_cats:
         return HTMLResponse(f'<div class="toast toast-error">Invalid category ID {category}</div>')
 
-    # Save to DB on cloud, filesystem locally
-    if db.get_database_url():
-        _db = db.get_db()
-        if hasattr(_db, 'save_custom_mapping'):
-            _db.save_custom_mapping(hevy_name, category, subcategory)
-    # Always update in-memory cache (+ filesystem fallback).
-    # Without this, _custom_mappings stays stale until process restart.
+    # Persists to DB on cloud, filesystem locally; updates memory cache.
     from hevy2garmin.mapper import save_custom_mapping
     save_custom_mapping(hevy_name, category, subcategory)
 

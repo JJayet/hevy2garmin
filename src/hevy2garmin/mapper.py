@@ -666,7 +666,21 @@ def _ensure_custom_loaded() -> None:
 
 
 def save_custom_mapping(hevy_name: str, category: int, subcategory: int) -> None:
-    """Save a custom exercise mapping to disk."""
+    """Save a custom exercise mapping (memory cache + disk when no DB)."""
+    _custom_mappings[hevy_name] = (category, subcategory)
+
+    # On cloud deployments DB is source of truth and serverless filesystems
+    # (Vercel) are read-only outside /tmp — persist to DB and skip disk.
+    try:
+        from hevy2garmin.db import get_database_url, get_db
+        if get_database_url():
+            _db = get_db()
+            if hasattr(_db, "save_custom_mapping"):
+                _db.save_custom_mapping(hevy_name, category, subcategory)
+            return
+    except Exception:
+        pass
+
     import json
     from pathlib import Path
     path = Path("~/.hevy2garmin/custom_mappings.json").expanduser()
@@ -679,7 +693,6 @@ def save_custom_mapping(hevy_name: str, category: int, subcategory: int) -> None
             pass
     existing[hevy_name] = [category, subcategory]
     path.write_text(json.dumps(existing, indent=2))
-    _custom_mappings[hevy_name] = (category, subcategory)
 
 
 def lookup_exercise(hevy_name: str) -> tuple[int, int, str]:
