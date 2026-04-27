@@ -1,0 +1,23 @@
+src/hevy2garmin/templates/workouts.html
+  bb19b4228b7364d1 158,162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "03064e87118d5c802a70cb1f231de5ee19f5a2b1",
+  "prompts": {
+    "bb19b4228b7364d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9a06cdd6-fffb-4943-9c33-7bd8be0d7e47",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Jonathan Jayet",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
