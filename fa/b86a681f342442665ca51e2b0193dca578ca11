@@ -1,0 +1,23 @@
+src/hevy2garmin/server.py
+  bb19b4228b7364d1 927-937
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "fab86a681f342442665ca51e2b0193dca578ca11",
+  "prompts": {
+    "bb19b4228b7364d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9a06cdd6-fffb-4943-9c33-7bd8be0d7e47",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Jonathan Jayet",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 0,
+      "accepted_lines": 11,
+      "overriden_lines": 0
+    }
+  }
+}
