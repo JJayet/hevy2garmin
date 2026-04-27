@@ -1,0 +1,25 @@
+src/hevy2garmin/server.py
+  bb19b4228b7364d1 92-102,108-109,117-118,927-937
+tests/test_unmapped_filter.py
+  bb19b4228b7364d1 1-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "fcdc5b2c857afe46c7800d2dc6e6c30e5795dd51",
+  "prompts": {
+    "bb19b4228b7364d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9a06cdd6-fffb-4943-9c33-7bd8be0d7e47",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Jonathan Jayet",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 0,
+      "accepted_lines": 88,
+      "overriden_lines": 0
+    }
+  }
+}
