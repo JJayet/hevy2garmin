@@ -1,0 +1,27 @@
+src/hevy2garmin/server.py
+  d6553087c2a9d691 920
+src/hevy2garmin/mapper.py
+  d6553087c2a9d691 669-683
+tests/test_mapper.py
+  d6553087c2a9d691 94-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "56d9b45f909f34fe0ae02c6867a8d744b01bee4f",
+  "prompts": {
+    "d6553087c2a9d691": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2daad33b-8e3b-4a88-8767-25d412f6cccd",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Jonathan Jayet",
+      "messages": [],
+      "total_additions": 67,
+      "total_deletions": 12,
+      "accepted_lines": 64,
+      "overriden_lines": 0
+    }
+  }
+}
